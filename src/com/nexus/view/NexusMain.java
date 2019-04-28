@@ -1,5 +1,7 @@
 package com.nexus.view;
 
+import com.nexus.command.Utils;
+import com.nexus.domain.Book;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.Scene;
@@ -7,9 +9,12 @@ import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+
 public class NexusMain extends Application {
 
-    private String[] books = new String[5];
+    String path = "C:\\Users\\Albany\\GitHub\\BetaBookApp\\src\\com\\nexus\\res\\books.nx";
 
     private MenuBar mBar;
     private Menu mnFile; // File menu and children nodes
@@ -34,15 +39,26 @@ public class NexusMain extends Application {
 
     private Label lblTitle;
     private Label title;
-    private String titleStr;
+    // private String titleStr;
 
     private Label lblAuthor;
     private Label author;
-    private String authorStr;
+    // private String authorStr;
+
+    private Label lblPublisher;
+    private Label publisher;
+    // private Label publisherStr;
+
+    private Label lblYear;
+    private Label year;
+    // private Label yearInt;
 
     private Label lblEdition;
     private Label edition;
-    private String editionStr;
+    // private String editionStr;
+
+    private Label lblRef;
+    private Label ref;
 
     @Override
     public void start(Stage stage) {
@@ -69,32 +85,61 @@ public class NexusMain extends Application {
 
         mBar.getMenus().addAll(mnFile, mnEdit, mnView, mnTool, mnHelp);
 
-        for (int i = 0; i < books.length; ++i)
-            books[i] = "Book" + i;
+
+        HashMap<String, Book> books = new HashMap<>();
+        Utils.readBook(path, books);
 
         lstvBook = new ListView<String>();
-        lstvBook.getItems().addAll(books);
+        lstvBook.getItems().addAll(books.keySet());
 
-        title = new Label();
-        author = new Label();
-        edition = new Label();
+        title = new Label("...");
+        author = new Label("...");
+        publisher = new Label("...");
+        year = new Label("...");
+        edition = new Label("...");
+        ref = new Label("...");
 
         lstvBook.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            title.setText(newValue);
-            author.setText(newValue);
-            edition.setText(newValue);
+            Book book = books.get(newValue);
+            title.setText(book.getTitle());
+            author.setText(book.getAuthor());
+            publisher.setText(book.getPublisher());
+            year.setText(String.valueOf(book.getYear()));
+            edition.setText(String.valueOf(book.getEdition()));
+
+            String[] name = book.getAuthor().split(" ");
+            String ed = "";
+            if (book.getEdition() == 1)
+                ed = "st";
+            if (book.getEdition() == 2)
+                ed = "nd";
+            if (book.getEdition() == 3)
+                ed = "rd";
+            if (book.getEdition() >= 4)
+                ed = "th";
+
+            ref.setText(String.format("%s, %s, %s (%s, %d, %d%s)",
+                    name[1], name[0], book.getTitle(),
+                    book.getPublisher(), book.getYear(),
+                    book.getEdition(), ed));
         });
 
         lstvBook.setStyle("-fx-padding: 10;");
 
         lblTitle = new Label("Title:");
         lblAuthor = new Label("Author:");
+        lblPublisher = new Label("Publisher:");
+        lblYear = new Label("Year:");
         lblEdition = new Label("Edition:");
+        lblRef = new Label("Ref.:");
 
         GridPane bookInfo = new GridPane();
         bookInfo.addRow(0, lblTitle, title);
         bookInfo.addRow(1, lblAuthor, author);
-        bookInfo.addRow(2, lblEdition, edition);
+        bookInfo.addRow(2, lblPublisher, publisher);
+        bookInfo.addRow(3, lblYear, year);
+        bookInfo.addRow(4, lblEdition, edition);
+        bookInfo.addRow(5, lblRef, ref);
         bookInfo.setVgap(10);
         bookInfo.setHgap(10);
 //        bookInfo.setMinSize(550, 410);

@@ -62,6 +62,7 @@ public class Main {
                     book.setPublisher(publisher);
                     book.setEdition(edition);
 
+                    Utils.readBook(path, books);
                     books.put(title, book);
 
                     Utils.saveBook(books, path);
